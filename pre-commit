@@ -1,0 +1,16 @@
+#!/bin/sh
+
+function fix_whitespace {
+  git diff --cached --no-color > /tmp/stage.diff \
+    && git apply --index -R /tmp/stage.diff \
+    && git apply --index --whitespace=fix /tmp/stage.diff 2>/dev/null
+
+  if git diff-index --quiet HEAD --; then
+      echo "pre-commit: Nothing left to commit after fixing whitespace errors below"
+      git apply --index /tmp/stage.diff 2>/dev/null
+      git diff --check --cached
+      return 1
+  fi
+}
+
+fix_whitespace
